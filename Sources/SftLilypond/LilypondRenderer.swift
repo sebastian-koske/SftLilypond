@@ -41,7 +41,7 @@ public class LilypondRenderer {
         case let .time(time):
             return render(time)
         case let .tole(tole):
-            return render(tole)
+            return render(tole: tole)
         case let .tone(tone):
             return render(tone)
         case let .volta(volta):
@@ -187,12 +187,8 @@ public class LilypondRenderer {
         return "\\time \(time.length)/\(time.fraction) \\set Score.voltaSpannerDuration = #(ly:make-moment \(time.length)/\(time.fraction)) "
     }
     
-    private func render(_ tole: NTole) -> String {
-        let innerContent = tole.toneOrRests
-            .flatMap(symbolTransformer.transform)
-            .map(self.toLilypondString)
-            .joined(separator: " ")
-        
+    private func render(tole: NTole) -> String {
+        let innerContent = render(tole.toneOrRests.flatMap(symbolTransformer.transform))
         return "\\tuplet \(tole.play)/\(tole.over) { \(innerContent) }"
     }
     

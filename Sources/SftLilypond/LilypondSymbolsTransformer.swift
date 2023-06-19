@@ -15,7 +15,7 @@ public class LilypondSymbolsTransformer {
         case let .named(primaries, _):
             return [.relative(.c, primaries)]
         case let .regular(primaries, _):
-            return transform(primaries: primaries)
+            return primaries.flatMap(self.transform)
         case let .staffBar(bar):
             return transform(bar: bar)
         case let .volta(volta):
@@ -57,18 +57,9 @@ public class LilypondSymbolsTransformer {
         
     }
     
-    public func transform(playedToneOrRest: PlayedToneOrRest) -> [LilypondPrimary] {
-        switch playedToneOrRest {
-        case let .tone(t):
-            return [.tone(t)]
-        case let .rest(r):
-            return [.rest(r)]
-        }
-    }
-    
     private func transform( bar: StaffBar) -> [LilypondPrimary] {
         
-        var result = transform(primaries: bar.primaryElements)
+        var result = bar.primaryElements.flatMap(self.transform)
         
         if let tempo = bar.tempo {
             result.insert(.tempo(tempo), at: 0)
@@ -98,12 +89,5 @@ public class LilypondSymbolsTransformer {
         
         return result
     }
-    
-    private func transform(primaries: [StaffPrimaryElementUnion]) -> [LilypondPrimary] {
-        return primaries.flatMap(self.transform)
-    }
-    
-    private func transform(staffBarSequence: StaffBarSequence) -> [LilypondPrimary] {
-        return transform(staffBarSequence: staffBarSequence.union)
-    }
+
 }
