@@ -257,4 +257,18 @@ public enum LilypondPrimaries {
         
         return "\\tuplet \(tole.play)/\(tole.over) { \(innerContent) }"
     }
+    
+}
+
+extension PlayedToneOrRest: LilypondSymbolSequence {
+    public func renderablePrimaries(context: LilypondProcessingContext) -> [LilypondPrimaries] {
+        switch self {
+            
+        case let .tone(t):
+            return [.tone(t)]
+        case let .rest(r):
+            return [.rest(r)]
+        }
+    }
+    
 }
