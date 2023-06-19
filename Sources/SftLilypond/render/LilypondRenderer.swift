@@ -12,17 +12,17 @@ public class LilypondRenderer {
     }
     
     public func toLilypondString(sequence: NamedStaffBarSequence) -> String {
-        let symbols: [LilypondPrimary] = symbolTransformer.transform(staffBarSequence: sequence.union)
+        let symbols: [LilypondPrimarySymbol] = symbolTransformer.transform(staffBarSequence: sequence.union)
         return render(symbols)
     }
     
-    private func render(_ primaries: [LilypondPrimary]) -> String {
+    private func render(_ primaries: [LilypondPrimarySymbol]) -> String {
         return primaries
             .map(self.toLilypondString)
             .joined(separator: " ")
     }
     
-    private func toLilypondString(_ p: LilypondPrimary) -> String {
+    private func toLilypondString(_ p: LilypondPrimarySymbol) -> String {
         switch p {
         case let .barLine(barLine):
             return render(barLine)

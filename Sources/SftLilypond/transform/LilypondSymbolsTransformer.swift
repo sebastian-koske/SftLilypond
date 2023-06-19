@@ -1,29 +1,35 @@
 import Foundation
 import SftMusicModel
 
+/**
+ Transforms musical sequences into corresponding lLilypond Symbols
+ */
+// version 0.2.0
 public class LilypondSymbolsTransformer {
     
     private let context: LilypondProcessingContext
     
+    // version 0.2.0
     public init(context: LilypondProcessingContext) {
         self.context = context
     }
     
-    public func transform(staffBarSequence: StaffBarSequenceUnion) -> [LilypondPrimary] {
+    // version 0.2.0
+    public func transform(staffBarSequence: StaffBarSequenceUnion) -> [LilypondPrimarySymbol] {
         
         switch staffBarSequence {
-        case let .named(primaries, _):
-            return [.relative(.c, primaries)]
-        case let .regular(primaries, _):
+        case let .relative(tone, primaries, _):
+            return [.relative(tone, primaries)]
+        case let .normal(primaries, _):
             return primaries.flatMap(self.transform)
         case let .staffBar(bar):
-            return transform(bar: bar)
+            return transformStaffBar(staffBar: bar)
         case let .volta(volta):
             return [.volta(volta)]
         }
     }
     
-    public func transform(staffPrimaryElement: StaffPrimaryElementUnion) -> [LilypondPrimary] {
+    public func transform(staffPrimaryElement: StaffPrimaryElementUnion) -> [LilypondPrimarySymbol] {
         switch staffPrimaryElement {
             
         case let .playable(playable):
@@ -57,33 +63,33 @@ public class LilypondSymbolsTransformer {
         
     }
     
-    private func transform( bar: StaffBar) -> [LilypondPrimary] {
+    private func transformStaffBar(staffBar: StaffBar) -> [LilypondPrimarySymbol] {
         
-        var result = bar.primaryElements.flatMap(self.transform)
+        var result = staffBar.primaryElements.flatMap(self.transform)
         
-        if let tempo = bar.tempo {
+        if let tempo = staffBar.tempo {
             result.insert(.tempo(tempo), at: 0)
         }
         
-        if let key = bar.key {
+        if let key = staffBar.key {
             result.insert(.key(key), at: 0)
         }
         
-        if let time = bar.time {
+        if let time = staffBar.time {
             result.insert(.time(time), at: 0)
         }
         
-        if let mark = bar.mark {
+        if let mark = staffBar.mark {
             result.insert(.mark(mark), at: 0)
         }
         
-        result.insert(.lineBreak(bar.breakMode), at: 0)
+        result.insert(.lineBreak(staffBar.breakMode), at: 0)
         
-        if let startLine = bar.startLine {
+        if let startLine = staffBar.startLine {
             result.insert(.barLine(startLine), at: 0)
         }
         
-        if let endLine = bar.endLine {
+        if let endLine = staffBar.endLine {
             result.append(.barLine(endLine))
         }
         

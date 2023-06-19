@@ -2,7 +2,11 @@ import Foundation
 
 import SftMusicModel
 
-public enum LilypondPrimary {
+/**
+ Represents all Lilypond primary symbols
+ */
+// version 0.2.0
+public enum LilypondPrimarySymbol {
     
     case barLine(BarLine)
     case key(Key)
@@ -15,18 +19,5 @@ public enum LilypondPrimary {
     case tole(NTole)
     case tone(PlayedTone)
     case volta(Volta)
-    
-}
-
-extension PlayedToneOrRest {
-    public func renderablePrimaries2(context: LilypondProcessingContext) -> [LilypondPrimary] {
-        switch self {
-            
-        case let .tone(t):
-            return [.tone(t)]
-        case let .rest(r):
-            return [.rest(r)]
-        }
-    }
     
 }
