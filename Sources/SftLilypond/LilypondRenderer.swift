@@ -1,10 +1,3 @@
-//
-//  File.swift
-//  
-//
-//  Created by Sebastian Koske on 19.06.23.
-//
-
 import Foundation
 import SftMusicModel
 
@@ -19,17 +12,17 @@ public class LilypondRenderer {
     }
     
     public func toLilypondString(sequence: NamedStaffBarSequence) -> String {
-        let symbols: [LilypondPrimaries] = symbolTransformer.transform(union: sequence.union)
+        let symbols: [LilypondPrimary] = symbolTransformer.transform(staffBarSequence: sequence.union)
         return render(symbols)
     }
     
-    private func render(_ primaries: [LilypondPrimaries]) -> String {
+    private func render(_ primaries: [LilypondPrimary]) -> String {
         return primaries
             .map(self.toLilypondString)
             .joined(separator: " ")
     }
     
-    private func toLilypondString(_ p: LilypondPrimaries) -> String {
+    private func toLilypondString(_ p: LilypondPrimary) -> String {
         switch p {
         case let .barLine(barLine):
             return render(barLine)
@@ -40,7 +33,7 @@ public class LilypondRenderer {
         case let .mark(mark):
             return renderMark(mark)
         case let .relative(note, sequence):
-            return  "\\relative \(render(note)) { \(render(sequence.flatMap{ $0.renderablePrimaries(context: context) })) }"
+            return  "\\relative \(render(note)) { \(render( sequence.flatMap{ symbolTransformer.transform(staffPrimaryElement: $0) })) }"
         case let .rest(rest):
             return renderRest(rest)
         case let .tempo(tempo):
@@ -52,7 +45,7 @@ public class LilypondRenderer {
         case let .tone(tone):
             return render(tone)
         case let .volta(volta):
-            return renderVolta(volta.primaryContent, volta.alternatives, context: context)
+            return renderVolta(primarySequence: volta.primaryContent, alternativeSequences: volta.alternatives)
         }
     }
     
@@ -196,7 +189,7 @@ public class LilypondRenderer {
     
     private func render(_ tole: NTole) -> String {
         let innerContent = tole.toneOrRests
-            .flatMap{ $0.renderablePrimaries(context: context) }
+            .flatMap(symbolTransformer.transform)
             .map(self.toLilypondString)
             .joined(separator: " ")
         
@@ -243,13 +236,15 @@ public class LilypondRenderer {
         return ""
     }
     
-    private func renderVolta(_ primary: StaffBarSequence, _ alternatives: [StaffBarSequence], context: LilypondProcessingContext) -> String {
+    private func renderVolta(primarySequence: StaffBarSequence, alternativeSequences: [StaffBarSequence]) -> String {
         
-        let total = alternatives.count
+        let total = alternativeSequences.count
         
-        let primary = "\\repeat volta \(total) { \(render(staffBarSequence: primary)) }"
+        let primary = "\\repeat volta \(total) { \(render(symbolTransformer.transform(staffBarSequence: primarySequence.union))) }"
         
-        let alternatives = alternatives
+        let alternatives = alternativeSequences
+            .map{ $0.union }
+            .map(symbolTransformer.transform)
             .map(self.render)
             .map{ "{ \($0) }"}
             .joined(separator: " ")
@@ -259,9 +254,5 @@ public class LilypondRenderer {
         
         return result
         
-    }
-    
-    private func render(staffBarSequence: StaffBarSequence) -> String {
-        return render(staffBarSequence.union.renderablePrimaries(context: context))
     }
 }

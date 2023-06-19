@@ -2,6 +2,6 @@ import Foundation
 
 public protocol LilypondSymbolSequence {
     
-    func renderablePrimaries(context: LilypondProcessingContext) -> [LilypondPrimaries]
+    func renderablePrimaries(context: LilypondProcessingContext) -> [LilypondPrimary]
     
 }

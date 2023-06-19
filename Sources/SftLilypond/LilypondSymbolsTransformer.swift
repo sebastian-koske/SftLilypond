@@ -9,9 +9,9 @@ public class LilypondSymbolsTransformer {
         self.context = context
     }
     
-    public func transform(union: StaffBarSequenceUnion) -> [LilypondPrimaries] {
+    public func transform(staffBarSequence: StaffBarSequenceUnion) -> [LilypondPrimary] {
         
-        switch union {
+        switch staffBarSequence {
         case let .named(primaries, _):
             return [.relative(.c, primaries)]
         case let .regular(primaries, _):
@@ -19,16 +19,12 @@ public class LilypondSymbolsTransformer {
         case let .staffBar(bar):
             return transform(bar: bar)
         case let .volta(volta):
-            return [transform(volta: volta)]
+            return [.volta(volta)]
         }
     }
     
-    private func transform(volta: Volta) -> LilypondPrimaries {
-        return .volta(volta)
-    }
-    
-    private func transform(element: StaffPrimaryElementUnion) -> [LilypondPrimaries] {
-        switch element {
+    public func transform(staffPrimaryElement: StaffPrimaryElementUnion) -> [LilypondPrimary] {
+        switch staffPrimaryElement {
             
         case let .playable(playable):
             switch playable {
@@ -61,7 +57,16 @@ public class LilypondSymbolsTransformer {
         
     }
     
-    private func transform( bar: StaffBar) -> [LilypondPrimaries] {
+    public func transform(playedToneOrRest: PlayedToneOrRest) -> [LilypondPrimary] {
+        switch playedToneOrRest {
+        case let .tone(t):
+            return [.tone(t)]
+        case let .rest(r):
+            return [.rest(r)]
+        }
+    }
+    
+    private func transform( bar: StaffBar) -> [LilypondPrimary] {
         
         var result = transform(primaries: bar.primaryElements)
         
@@ -94,7 +99,11 @@ public class LilypondSymbolsTransformer {
         return result
     }
     
-    private func transform(primaries: [StaffPrimaryElementUnion]) -> [LilypondPrimaries] {
+    private func transform(primaries: [StaffPrimaryElementUnion]) -> [LilypondPrimary] {
         return primaries.flatMap(self.transform)
+    }
+    
+    private func transform(staffBarSequence: StaffBarSequence) -> [LilypondPrimary] {
+        return transform(staffBarSequence: staffBarSequence.union)
     }
 }

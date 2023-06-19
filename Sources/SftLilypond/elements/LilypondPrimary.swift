@@ -2,7 +2,7 @@ import Foundation
 
 import SftMusicModel
 
-public enum LilypondPrimaries {
+public enum LilypondPrimary {
     
     case barLine(BarLine)
     case key(Key)
@@ -16,12 +16,10 @@ public enum LilypondPrimaries {
     case tone(PlayedTone)
     case volta(Volta)
     
-    
-    
 }
 
-extension PlayedToneOrRest: LilypondSymbolSequence {
-    public func renderablePrimaries(context: LilypondProcessingContext) -> [LilypondPrimaries] {
+extension PlayedToneOrRest {
+    public func renderablePrimaries2(context: LilypondProcessingContext) -> [LilypondPrimary] {
         switch self {
             
         case let .tone(t):
