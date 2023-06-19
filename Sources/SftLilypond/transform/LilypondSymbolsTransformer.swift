@@ -15,12 +15,20 @@ public class LilypondSymbolsTransformer {
     }
     
     // version 0.2.0
+    public func transform(sequence: NamedStaffBarSequence) -> [LilypondPrimarySymbol] {
+        
+      
+        return [.relative(.c, sequence.primaryElements)]
+        
+    }
+    
+    // version 0.2.0
     public func transform(staffBarSequence: StaffBarSequenceUnion) -> [LilypondPrimarySymbol] {
         
         switch staffBarSequence {
-        case let .relative(tone, primaries, _):
-            return [.relative(tone, primaries)]
-        case let .normal(primaries, _):
+//        case let .relative(tone, primaries, _):
+//            return [.relative(tone, primaries)]
+        case let .inner(primaries, _):
             return primaries.flatMap(self.transform)
         case let .staffBar(bar):
             return transformStaffBar(staffBar: bar)

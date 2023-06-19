@@ -12,7 +12,7 @@ public class LilypondRenderer {
     }
     
     public func toLilypondString(sequence: NamedStaffBarSequence) -> String {
-        let symbols: [LilypondPrimarySymbol] = symbolTransformer.transform(staffBarSequence: sequence.union)
+        let symbols: [LilypondPrimarySymbol] = symbolTransformer.transform(sequence: sequence)
         return render(symbols)
     }
     
